@@ -1,0 +1,47 @@
+
+spring:
+  shardingsphere:
+    datasource:
+      names: master,slave                                   # 数据源名字
+      master:
+        type: com.zaxxer.hikari.HikariDataSource        # 连接池
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        jdbc-url: jdbc:mysql://localhost:3306/order1?allowMultiQueries=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai #主库地址
+        username: root
+        password: root
+        hikari:
+          maximum-pool-size: 20                        #最大连接数量
+          minimum-idle: 10                             #最小空闲连接数
+          max-lifetime: 0                          #最大生命周期，0不过期。不等于0且小于30秒，会被重置为默认值30分钟.设置应该比mysql设置的超时时间短
+          idle-timeout: 30000                          #空闲连接超时时长，默认值600000（10分钟）
+          connection-timeout: 60000                    #连接超时时长
+          data-source-properties:
+            prepStmtCacheSize: 250
+            prepStmtCacheSqlLimit: 2048
+            cachePrepStmts: true
+            useServerPrepStmts: true
+      slave:
+        type: com.zaxxer.hikari.HikariDataSource        # 连接池
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        jdbc-url: jdbc:mysql://localhost:3306/order1?allowMultiQueries=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai #从库地址
+        username: root
+        password: root
+        hikari:
+          maximum-pool-size: 20
+          minimum-idle: 10
+          max-lifetime: 0
+          idle-timeout: 30000
+          connection-timeout: 60000
+          data-source-properties:
+            prepStmtCacheSize: 250
+            prepStmtCacheSqlLimit: 2048
+            cachePrepStmts: true
+            useServerPrepStmts: true
+    masterslave:
+      load-balance-algorithm-type: round_robin              # 负载均衡算法，用于配置从库负载均衡算法类型，可选值：ROUND_ROBIN(轮询)，RANDOM（随机）
+      name: ms                                              # 最终的数据源名称
+      master-data-source-name: master                       # 主库数据源名称
+      slave-data-source-names: slave                        # 从库数据源名称列表，多个逗号分隔
+    props:
+      sql:
+        show: true                                          # 在执行SQL时，会打印SQL，并显示执行库的名称，默认false
